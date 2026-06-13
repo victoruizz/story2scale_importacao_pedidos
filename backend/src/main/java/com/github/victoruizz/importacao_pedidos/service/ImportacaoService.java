@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +46,10 @@ public class ImportacaoService {
         rabbitTemplate.convertAndSend(RabbitConfig.FILA_IMPORTACAO, salva.getId());
 
         return salva.getId();
+    }
+
+    public List<Importacao> listarImportacoes() {
+        return importacaoRepository.findAll();
     }
 
 }
