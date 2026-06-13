@@ -2,7 +2,9 @@ package com.github.victoruizz.importacao_pedidos.listener;
 
 import com.github.victoruizz.importacao_pedidos.config.RabbitConfig;
 import com.github.victoruizz.importacao_pedidos.dto.LinhaCsv;
+import com.github.victoruizz.importacao_pedidos.entity.ErroImportacao;
 import com.github.victoruizz.importacao_pedidos.entity.Importacao;
+import com.github.victoruizz.importacao_pedidos.entity.Pedido;
 import com.github.victoruizz.importacao_pedidos.entity.StatusImportacao;
 import com.github.victoruizz.importacao_pedidos.repository.ErroImportacaoRepository;
 import com.github.victoruizz.importacao_pedidos.repository.ImportacaoRepository;
@@ -13,10 +15,15 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @AllArgsConstructor
@@ -38,6 +45,9 @@ public class ImportacaoListener {
         Path caminho = Paths.get("uploads", importacao.getNomeArquivo());
         try{
             List<String> linhas = Files.readAllLines(caminho);
+
+            Set<String> numerosVistos = new HashSet<>();
+
             for(int i = 1; i < linhas.size(); i++){
                 String linhaAtual = linhas.get(i);
 
@@ -53,8 +63,53 @@ public class ImportacaoListener {
                         campos[6]  // dataPedido
                 );
 
+                String numero = linha.getNumeroPedido();
+                boolean duplicadoNoArquivo = numerosVistos.contains(numero);
+                boolean duplicadoNoBanco = pedidoRepository.existsByNumeroPedido(numero);
+
+                if (duplicadoNoArquivo || duplicadoNoBanco) {
+                    ErroImportacao erro = new ErroImportacao();
+                    erro.setImportacao(importacao);
+                    erro.setLinha(i);
+                    erro.setNumeroPedido(numero);
+                    erro.setMensagem("numero_pedido duplicado");
+                    erroImportacaoRepository.save(erro);
+                    continue;
+                }
+
+                numerosVistos.add(numero);
+
                 List<String> erros = validadorLinha.validar(linha);
-                System.out.println("Linha: " + i + " - Erros: " + erros);
+                if(erros.isEmpty()){
+
+                    Pedido pedido = new Pedido();
+                    pedido.setNumeroPedido(linha.getNumeroPedido());
+                    pedido.setCliente(linha.getCliente());
+                    pedido.setDocumentoCliente(linha.getDocumentoCliente());
+                    pedido.setProduto(linha.getProduto());
+
+                    int quantidade = Integer.parseInt(linha.getQuantidade().trim());
+                    BigDecimal valorUnitario = new BigDecimal(linha.getValorUnitario().trim());
+
+                    pedido.setQuantidade(quantidade);
+                    pedido.setValorUnitario(valorUnitario);
+                    pedido.setValorTotal(valorUnitario.multiply(BigDecimal.valueOf(quantidade)));
+
+                    pedido.setDataPedido(LocalDate.parse(linha.getDataPedido().trim()));
+                    pedido.setImportacao(importacao);
+                    pedido.setCriadoEm(LocalDateTime.now());
+
+                    pedidoRepository.save(pedido);
+                } else{
+                    for(String mensagemErro : erros){
+                        ErroImportacao erro = new ErroImportacao();
+                        erro.setImportacao(importacao);
+                        erro.setLinha(i);
+                        erro.setNumeroPedido(linha.getNumeroPedido());
+                        erro.setMensagem(mensagemErro);
+                        erroImportacaoRepository.save(erro);
+                    }
+                }
             }
         } catch (IOException e){
             throw new RuntimeException("Erro ao ler arquivo", e);
