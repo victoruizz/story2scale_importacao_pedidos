@@ -48,6 +48,10 @@ public class ImportacaoListener {
 
             Set<String> numerosVistos = new HashSet<>();
 
+            int totalLinhas = 0;
+            int linhasValidas = 0;
+            int linhasInvalidas = 0;
+
             for(int i = 1; i < linhas.size(); i++){
                 String linhaAtual = linhas.get(i);
 
@@ -63,6 +67,8 @@ public class ImportacaoListener {
                         campos[6]  // dataPedido
                 );
 
+                totalLinhas++;
+
                 String numero = linha.getNumeroPedido();
                 boolean duplicadoNoArquivo = numerosVistos.contains(numero);
                 boolean duplicadoNoBanco = pedidoRepository.existsByNumeroPedido(numero);
@@ -74,6 +80,7 @@ public class ImportacaoListener {
                     erro.setNumeroPedido(numero);
                     erro.setMensagem("numero_pedido duplicado");
                     erroImportacaoRepository.save(erro);
+                    linhasInvalidas++;
                     continue;
                 }
 
@@ -98,8 +105,9 @@ public class ImportacaoListener {
                     pedido.setDataPedido(LocalDate.parse(linha.getDataPedido().trim()));
                     pedido.setImportacao(importacao);
                     pedido.setCriadoEm(LocalDateTime.now());
-
+                    linhasValidas++;
                     pedidoRepository.save(pedido);
+
                 } else{
                     for(String mensagemErro : erros){
                         ErroImportacao erro = new ErroImportacao();
@@ -108,9 +116,24 @@ public class ImportacaoListener {
                         erro.setNumeroPedido(linha.getNumeroPedido());
                         erro.setMensagem(mensagemErro);
                         erroImportacaoRepository.save(erro);
+
                     }
+                    linhasInvalidas++;
                 }
             }
+
+            importacao.setTotalLinhas(totalLinhas);
+            importacao.setLinhasValidas(linhasValidas);
+            importacao.setLinhasInvalidas(linhasInvalidas);
+
+
+            if (linhasInvalidas == 0) {
+                importacao.setStatus(StatusImportacao.CONCLUIDA);
+            } else {
+                importacao.setStatus(StatusImportacao.CONCLUIDA_COM_ERROS);
+            }
+
+            importacaoRepository.save(importacao);
         } catch (IOException e){
             throw new RuntimeException("Erro ao ler arquivo", e);
         }
