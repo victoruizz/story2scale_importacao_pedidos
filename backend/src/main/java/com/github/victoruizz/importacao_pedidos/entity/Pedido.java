@@ -1,5 +1,6 @@
 package com.github.victoruizz.importacao_pedidos.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,7 @@ public class Pedido {
 
     private LocalDate dataPedido;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "importacao_id")
     private Importacao importacao;

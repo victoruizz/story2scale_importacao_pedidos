@@ -1,5 +1,6 @@
 package com.github.victoruizz.importacao_pedidos.controller;
 
+import com.github.victoruizz.importacao_pedidos.dto.ImportacaoDetalheDTO;
 import com.github.victoruizz.importacao_pedidos.entity.Importacao;
 import com.github.victoruizz.importacao_pedidos.service.ImportacaoService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,11 @@ public class ImportacaoController {
     @GetMapping
     public List<Importacao> listar() {
         return importacaoService.listarImportacoes();
+    }
+
+    @GetMapping("/{id}")
+    public ImportacaoDetalheDTO detalhar(@PathVariable Long id) {
+        return importacaoService.detalharImportacao(id);
     }
 
 

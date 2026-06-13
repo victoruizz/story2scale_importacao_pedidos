@@ -1,9 +1,14 @@
 package com.github.victoruizz.importacao_pedidos.service;
 
 import com.github.victoruizz.importacao_pedidos.config.RabbitConfig;
+import com.github.victoruizz.importacao_pedidos.dto.ImportacaoDetalheDTO;
+import com.github.victoruizz.importacao_pedidos.entity.ErroImportacao;
 import com.github.victoruizz.importacao_pedidos.entity.Importacao;
+import com.github.victoruizz.importacao_pedidos.entity.Pedido;
 import com.github.victoruizz.importacao_pedidos.entity.StatusImportacao;
+import com.github.victoruizz.importacao_pedidos.repository.ErroImportacaoRepository;
 import com.github.victoruizz.importacao_pedidos.repository.ImportacaoRepository;
+import com.github.victoruizz.importacao_pedidos.repository.PedidoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -21,6 +26,8 @@ import java.util.List;
 public class ImportacaoService {
 
     private final ImportacaoRepository importacaoRepository;
+    private final PedidoRepository pedidoRepository;
+    private final ErroImportacaoRepository erroImportacaoRepository;
     private final RabbitTemplate rabbitTemplate;
 
     public Long criarImportacao(MultipartFile arquivo){
@@ -50,6 +57,15 @@ public class ImportacaoService {
 
     public List<Importacao> listarImportacoes() {
         return importacaoRepository.findAll();
+    }
+
+    public ImportacaoDetalheDTO detalharImportacao(Long id) {
+        Importacao importacao = importacaoRepository.findById(id).orElseThrow();
+
+        List<Pedido> pedidos = pedidoRepository.findByImportacaoId(id);
+        List<ErroImportacao> erros = erroImportacaoRepository.findByImportacaoId(id);
+
+        return new ImportacaoDetalheDTO(importacao, pedidos, erros);
     }
 
 }
