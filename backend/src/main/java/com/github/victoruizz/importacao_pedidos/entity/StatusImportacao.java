@@ -1,4 +1,5 @@
-@Enumerated(EnumType.STRING)
+package com.github.victoruizz.importacao_pedidos.entity;
+
 public enum StatusImportacao {
     RECEBIDA,
     PROCESSANDO,
