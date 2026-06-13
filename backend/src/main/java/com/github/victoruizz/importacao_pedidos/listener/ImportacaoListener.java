@@ -135,9 +135,15 @@ public class ImportacaoListener {
 
             importacaoRepository.save(importacao);
         } catch (IOException e){
-            throw new RuntimeException("Erro ao ler arquivo", e);
+            marcarComoFalhou(importacao);
+        } catch (Exception e){
+            marcarComoFalhou(importacao);
         }
 
     }
 
+    private void marcarComoFalhou(Importacao importacao) {
+        importacao.setStatus(StatusImportacao.FALHOU);
+        importacaoRepository.save(importacao);
+    }
 }
