@@ -1,0 +1,122 @@
+<div class="cabecalho">
+  <div>
+    <h1 class="page-title">Detalhe da importacao</h1>
+    <p class="page-subtitle">
+      <a routerLink="/historico">Voltar ao historico</a>
+    </p>
+  </div>
+  @if (id() !== null) {
+    <button class="btn btn-secundario" type="button" (click)="carregar(id()!)" [disabled]="carregando()">
+      {{ carregando() ? 'Atualizando...' : 'Atualizar' }}
+    </button>
+  }
+</div>
+
+@if (erro()) {
+  <div class="alerta alerta-erro">{{ erro() }}</div>
+}
+
+@if (carregando() && !detalhe()) {
+  <div class="card"><p class="carregando">Carregando...</p></div>
+}
+
+@if (detalhe(); as d) {
+  <div class="card">
+    <div class="card-header">
+      <h2>Resumo</h2>
+      <a class="btn btn-primary" [routerLink]="['/pedidos']" [queryParams]="{ importacaoId: d.importacao.id }">
+        Ver pedidos desta importacao
+      </a>
+    </div>
+    <p class="resumo-arquivo">
+      {{ d.importacao.nomeArquivo }}
+      <span [class]="classeStatus(d.importacao.status)">{{ rotuloStatus(d.importacao.status) }}</span>
+    </p>
+    <div class="metricas">
+      <div class="metrica">
+        <div class="metrica-rotulo">Total de linhas</div>
+        <div class="metrica-valor">{{ d.importacao.totalLinhas }}</div>
+      </div>
+      <div class="metrica">
+        <div class="metrica-rotulo">Validas</div>
+        <div class="metrica-valor">{{ d.importacao.linhasValidas }}</div>
+      </div>
+      <div class="metrica">
+        <div class="metrica-rotulo">Invalidas</div>
+        <div class="metrica-valor">{{ d.importacao.linhasInvalidas }}</div>
+      </div>
+      <div class="metrica">
+        <div class="metrica-rotulo">Criada em</div>
+        <div class="metrica-valor pequeno">{{ d.importacao.criadoEm | date: 'dd/MM/yyyy HH:mm' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Erros ({{ d.erros.length }})</h2>
+    @if (d.erros.length === 0) {
+      <p class="vazio">Nenhum erro registrado.</p>
+    } @else {
+      <div class="tabela-wrap">
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th class="num">Linha</th>
+              <th>Numero pedido</th>
+              <th>Campo</th>
+              <th>Mensagem</th>
+              <th>Valor recebido</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (erro of d.erros; track erro.id) {
+              <tr>
+                <td class="num">{{ erro.linha }}</td>
+                <td>{{ erro.numeroPedido }}</td>
+                <td>{{ erro.campo }}</td>
+                <td class="quebra">{{ erro.mensagem }}</td>
+                <td>{{ erro.valorRecebido }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  <div class="card">
+    <h2>Pedidos criados ({{ d.pedidos.length }})</h2>
+    @if (d.pedidos.length === 0) {
+      <p class="vazio">Nenhum pedido criado.</p>
+    } @else {
+      <div class="tabela-wrap">
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th>Numero</th>
+              <th>Cliente</th>
+              <th>Produto</th>
+              <th class="num">Qtd</th>
+              <th class="num">Valor unit.</th>
+              <th class="num">Valor total</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (pedido of d.pedidos; track pedido.id) {
+              <tr>
+                <td>{{ pedido.numeroPedido }}</td>
+                <td>{{ pedido.cliente }}</td>
+                <td>{{ pedido.produto }}</td>
+                <td class="num">{{ pedido.quantidade }}</td>
+                <td class="num">{{ pedido.valorUnitario | currency: 'BRL' }}</td>
+                <td class="num">{{ pedido.valorTotal | currency: 'BRL' }}</td>
+                <td>{{ pedido.dataPedido | date: 'dd/MM/yyyy' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+}

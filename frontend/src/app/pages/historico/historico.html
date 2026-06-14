@@ -1,0 +1,48 @@
+<div class="cabecalho">
+  <div>
+    <h1 class="page-title">Historico de importacoes</h1>
+    <p class="page-subtitle">O processamento e assincrono. Use atualizar para ver o status mais recente.</p>
+  </div>
+  <button class="btn btn-secundario" type="button" (click)="carregar()" [disabled]="carregando()">
+    {{ carregando() ? 'Atualizando...' : 'Atualizar' }}
+  </button>
+</div>
+
+<div class="card">
+  @if (erro()) {
+    <div class="alerta alerta-erro">{{ erro() }}</div>
+  }
+
+  @if (carregando() && importacoes().length === 0) {
+    <p class="carregando">Carregando...</p>
+  } @else if (importacoes().length === 0) {
+    <p class="vazio">Nenhuma importacao encontrada.</p>
+  } @else {
+    <div class="tabela-wrap">
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>Arquivo</th>
+            <th>Data</th>
+            <th>Status</th>
+            <th class="num">Total</th>
+            <th class="num">Validas</th>
+            <th class="num">Invalidas</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (imp of importacoes(); track imp.id) {
+            <tr class="clicavel" (click)="abrir(imp)">
+              <td>{{ imp.nomeArquivo }}</td>
+              <td>{{ imp.criadoEm | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td><span [class]="classeStatus(imp.status)">{{ rotuloStatus(imp.status) }}</span></td>
+              <td class="num">{{ imp.totalLinhas }}</td>
+              <td class="num">{{ imp.linhasValidas }}</td>
+              <td class="num">{{ imp.linhasInvalidas }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

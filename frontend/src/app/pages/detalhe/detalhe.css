@@ -1,0 +1,43 @@
+.cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.cabecalho .page-subtitle {
+  margin-bottom: 0;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.card-header h2 {
+  margin: 0;
+}
+
+.resumo-arquivo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 8px 0 20px;
+  font-weight: 500;
+}
+
+.metrica-valor.pequeno {
+  font-size: 1rem;
+}
+
+.tabela td.quebra {
+  white-space: normal;
+  min-width: 220px;
+}

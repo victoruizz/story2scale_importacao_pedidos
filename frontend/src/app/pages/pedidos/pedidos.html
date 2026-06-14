@@ -1,0 +1,76 @@
+<h1 class="page-title">Pedidos</h1>
+<p class="page-subtitle">Lista geral de pedidos. Use os filtros para refinar a busca.</p>
+
+<div class="card">
+  <form (ngSubmit)="buscar()">
+    <div class="form-grid">
+      <div class="campo">
+        <label for="numeroPedido">Numero do pedido</label>
+        <input id="numeroPedido" class="input" type="text" name="numeroPedido" [(ngModel)]="numeroPedido" />
+      </div>
+      <div class="campo">
+        <label for="cliente">Cliente</label>
+        <input id="cliente" class="input" type="text" name="cliente" [(ngModel)]="cliente" />
+      </div>
+      <div class="campo">
+        <label for="dataPedido">Data do pedido</label>
+        <input id="dataPedido" class="input" type="date" name="dataPedido" [(ngModel)]="dataPedido" />
+      </div>
+      <div class="campo">
+        <label for="importacaoId">Importacao de origem (ID)</label>
+        <input id="importacaoId" class="input" type="number" name="importacaoId" [(ngModel)]="importacaoId" />
+      </div>
+    </div>
+    <div class="acoes">
+      <button class="btn btn-primary" type="submit" [disabled]="carregando()">
+        {{ carregando() ? 'Buscando...' : 'Buscar' }}
+      </button>
+      <button class="btn btn-secundario" type="button" (click)="limpar()" [disabled]="carregando()">
+        Limpar
+      </button>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  @if (erro()) {
+    <div class="alerta alerta-erro">{{ erro() }}</div>
+  }
+
+  @if (carregando() && pedidos().length === 0) {
+    <p class="carregando">Carregando...</p>
+  } @else if (buscou() && pedidos().length === 0) {
+    <p class="vazio">Nenhum pedido encontrado.</p>
+  } @else if (pedidos().length > 0) {
+    <div class="tabela-wrap">
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>Numero</th>
+            <th>Cliente</th>
+            <th>Documento</th>
+            <th>Produto</th>
+            <th class="num">Qtd</th>
+            <th class="num">Valor unit.</th>
+            <th class="num">Valor total</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (pedido of pedidos(); track pedido.id) {
+            <tr>
+              <td>{{ pedido.numeroPedido }}</td>
+              <td>{{ pedido.cliente }}</td>
+              <td>{{ pedido.documentoCliente }}</td>
+              <td>{{ pedido.produto }}</td>
+              <td class="num">{{ pedido.quantidade }}</td>
+              <td class="num">{{ pedido.valorUnitario | currency: 'BRL' }}</td>
+              <td class="num">{{ pedido.valorTotal | currency: 'BRL' }}</td>
+              <td>{{ pedido.dataPedido | date: 'dd/MM/yyyy' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
