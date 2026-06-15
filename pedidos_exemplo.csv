@@ -1,0 +1,9 @@
+numero_pedido,cliente,documento_cliente,produto,quantidade,valor_unitario,data_pedido
+PED-001,Empresa Alfa,12345678000199,Notebook Dell,2,3500.00,2026-06-01
+PED-002,Empresa Beta,98765432000188,Monitor LG,3,900.00,2026-06-01
+PED-003,,11222333000144,Mouse Logitech,5,120.00,2026-06-02
+PED-004,Empresa Delta,99888777000166,Teclado Mecanico,0,300.00,2026-06-02
+PED-005,Empresa Epsilon,55666777000122,Webcam Full HD,1,-50.00,2026-06-03
+PED-006,Empresa Zeta,44555666000133,Headset Gamer,2,250.00,2099-12-31
+PED-007,Empresa Eta,33444555000144,SSD 1TB,abc,450.00,2026-06-04
+PED-001,Empresa Alfa,12345678000199,Notebook Dell,2,3500.00,2026-06-01
