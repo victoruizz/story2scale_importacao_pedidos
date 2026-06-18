@@ -14,7 +14,7 @@ Sistema web para importar pedidos de compra via arquivo CSV. O usuário faz o up
 ## Pré-requisitos
 
 - Docker e Docker Compose instalados (com o Docker Desktop aberto)
-- Java 22
+- Java 21
 - Node.js e Angular CLI (para o frontend)
 
 ## Como rodar
