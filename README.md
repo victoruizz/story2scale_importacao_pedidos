@@ -4,7 +4,7 @@ Sistema web para importar pedidos de compra via arquivo CSV. O usuário faz o up
 
 ## Tecnologias
 
-- **Backend:** Java 22 + Spring Boot
+- **Backend:** Java 21 + Spring Boot
 - **Banco de dados:** PostgreSQL
 - **Mensageria (processamento assíncrono):** RabbitMQ
 - **Migrations:** Flyway
